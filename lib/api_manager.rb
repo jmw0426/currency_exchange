@@ -3,7 +3,7 @@ class CurrencyExchange::APIManager
 
     BASE_URL = "https://api.exchangeratesapi.io/latest?base=USD"
 
-    def self.get_rates
+    def self.get_rates(page=1, limit=10)
         puts "Network request"
 
         url = BASE_URL
