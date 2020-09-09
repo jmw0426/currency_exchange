@@ -5,3 +5,4 @@ require_relative "../lib/environment"
 puts "Hello world"
 
 CurrencyExchange::APIManager.get_rates
+binding.pry
