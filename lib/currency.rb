@@ -12,12 +12,6 @@ class CurrencyExchange::Currency
         hash.each { |key, value| self.new(key, value) }
     end
 
-    def self.get_single_currency(input)
-        self.all.select do |name| 
-            name == input 
-        end
-    end
-
     def self.all
         @@all
     end

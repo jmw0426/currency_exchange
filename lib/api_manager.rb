@@ -1,12 +1,10 @@
 require 'pry'
 class CurrencyExchange::APIManager
 
-    BASE_URL = "https://api.exchangeratesapi.io/latest?base=USD"
+    BASE_URL = "https://api.exchangeratesapi.io/"
 
     def self.get_rates(page=1, limit=10)
-        puts "Network request"
-
-        url = BASE_URL
+        url = BASE_URL + "latest?base=USD"
         response = HTTParty.get(url)
         r = response["rates"]
         # 33 return values
