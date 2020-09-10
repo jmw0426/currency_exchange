@@ -2,7 +2,7 @@ class CurrencyExchange::CLI
     attr_accessor :error_input
     def initialize
         @page = 1
-        @limit = 33
+        @limit = 11
         @error_input = []
     end
 
@@ -80,6 +80,19 @@ class CurrencyExchange::CLI
         # binding.pry
     end
 
+    def action_menu
+        puts "Type 'exit' to exit the program."
+        sleep(1)
+        puts "Or type 'menu' to see the list of currencies."
+        input = gets.strip
+        case input
+        when "exit"
+            exit
+        when "menu"
+            
+        end
+    end
+
     def get_currency_choice
         input = gets.strip.downcase
         commands = ["exit", "next", "prev"]
@@ -89,14 +102,6 @@ class CurrencyExchange::CLI
         else
             error_message
             return "invalid" 
-        end
-    end
-
-    def display_currency
-        start, stop = get_page_range
-        currency = CurrencyExchange::Currency.all[start...stop]
-        currency.each.with_index(1) do |abbr, index|
-            puts "#{index}. #{abbr.name}"
         end
     end
 
@@ -141,28 +146,30 @@ class CurrencyExchange::CLI
             sleep 0.15
             puts currency
         end
-        puts "\n"
-    end
-
-    def get_page_range
-        [(@page - 1) * @limit, @page * @limit]
+        puts "\n\n"
     end
 
     def display_single_currency(i)
         self.error_input << i
         currency_obj = CurrencyExchange::Currency.all[i]
-        # binding.pry
+        puts "\n\n"
+        sleep(1)
         puts "It takes #{currency_obj.value} #{currency_obj.name} to equal the value of 1 US dollar."
+        sleep(1)
+        puts "\n\n\n\n"
         puts "Enter a USD value to convert to #{currency_obj.name}."
+        puts "---------------------------------------"
         input = gets.strip.to_f
         exchange = input * currency_obj.value.to_f
         if exchange == 0
             error_dsc
         else
+            puts "\n\n"
             puts "#{input} USD is equal to #{exchange} #{currency_obj.name}."
             self.error_input.clear
-            puts "Press 'enter' to continue"
-            gets
+            puts "\n\n"
+            sleep(1)
+            action_menu
         end
     end
 
@@ -194,16 +201,6 @@ class CurrencyExchange::CLI
         puts <<-INST
 Please choose a currency by number or type 'exit' to exit the program.
         INST
+        puts "------------------------------------------------------------------"
     end
-
-    # class MultiplicationError > StandardError
-    #     print "."
-    #     sleep(1)
-    #     print "."
-    #     sleep(1)
-    #     print "."
-    #     sleep(1)
-    #     puts "That is not a valid entry."
-    #     sleep(1)
-    # end
 end
