@@ -26,20 +26,18 @@ class CurrencyExchange::CLI
          ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝       ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
         
          EOF
+        sleep(2) 
         puts "        --------------------------------------------------------------------------------------------------------------------------------------------" 
         puts "\n"
-        sleep(1) 
         puts '                                                            Welcome to the Currency Exchange!'
-        sleep(2)
         puts "\n\n"
         puts '                                                  All currency rates are measured off of the US dollar.'
         puts "\n\n"
-        sleep(1)
         puts '                                             Simply type in the number of the currency and start exchanging.'
         puts "\n"
         puts "        --------------------------------------------------------------------------------------------------------------------------------------------" 
         puts "\n\n"
-        sleep(1)
+        sleep(2)
     end
 
     def get_currency_data
@@ -52,21 +50,10 @@ class CurrencyExchange::CLI
             input = get_currency_choice
             case input
             when "exit"
+                exit_message
                 break
             when "invalid"
                 next
-            when "next"
-                @page += 1
-                _, stop = get_page_range
-                if CurrencyExchange::Currency.all.length < stop
-                    get_currency_data
-                end
-            when "prev"
-                if @page <= 1
-                    puts "You are on page 1!"
-                else
-                    @page -= 1
-                end
             else
                 display_single_currency(input)
             end
@@ -84,18 +71,19 @@ class CurrencyExchange::CLI
         puts "Type 'exit' to exit the program."
         sleep(1)
         puts "Or type 'menu' to see the list of currencies."
+        puts "---------------------------------------------"
         input = gets.strip
         case input
         when "exit"
-            exit
+            exit_confirmation
         when "menu"
-            
+            puts "\n\n"
         end
     end
 
     def get_currency_choice
         input = gets.strip.downcase
-        commands = ["exit", "next", "prev"]
+        commands = ["exit", "menu"]
         return input.downcase if commands.include?(input.downcase)
         if input.to_i.between?(1, CurrencyExchange::Currency.all.length)
             return input.to_i - 1
@@ -140,6 +128,7 @@ class CurrencyExchange::CLI
         "32. KRW = South Korean won",
         "33. PLN = Polish złoty"]
 
+        # puts "\n\n"
         puts "CURRENCIES:"
         puts "\n"
         currencies.each do |currency| 
@@ -158,14 +147,16 @@ class CurrencyExchange::CLI
         sleep(1)
         puts "\n\n\n\n"
         puts "Enter a USD value to convert to #{currency_obj.name}."
-        puts "---------------------------------------"
-        input = gets.strip.to_f
-        exchange = input * currency_obj.value.to_f
-        if exchange == 0
+        puts "------------------------------------"
+        input = gets.strip
+        exchange = input.to_f * currency_obj.value.to_f
+        if input == 'exit'
+            exit_confirmation
+        elsif exchange == 0
             error_dsc
         else
             puts "\n\n"
-            puts "#{input} USD is equal to #{exchange} #{currency_obj.name}."
+            puts "#{input.to_f} USD is equal to #{exchange} #{currency_obj.name}."
             self.error_input.clear
             puts "\n\n"
             sleep(1)
@@ -189,7 +180,7 @@ class CurrencyExchange::CLI
         puts "\n\n\n\n"
         puts "That is not a valid entry."
         sleep(1)
-        puts "\n\n\n\n"
+        puts "\n\n\n"
     end
 
     def redirect_to_dsc
@@ -201,6 +192,62 @@ class CurrencyExchange::CLI
         puts <<-INST
 Please choose a currency by number or type 'exit' to exit the program.
         INST
-        puts "------------------------------------------------------------------"
+        puts "----------------------------------------------------------------------"
+    end
+
+    def exit_message
+        puts "\n\n"
+        puts "Thank you for using the Currency Exchange!"
+        puts "\n\n\n\n"
+        powered_by 
+        puts "----------------------------------------------"
+        puts"\n"
+        puts "- https://api.exchangeratesapi.io/"
+        puts "\n\n"
+        puts "- https://github.com/jmw0426/currency_exchange"
+        puts "\n"
+        puts "----------------------------------------------"
+        sleep(1.5)
+    end
+
+    def powered_by
+        print "P"
+        sleep(0.15)
+        print "o"
+        sleep(0.15)
+        print "w"
+        sleep(0.15)
+        print "e"
+        sleep(0.15)
+        print "r"
+        sleep(0.15)
+        print "e"
+        sleep(0.15)
+        print "d"
+        sleep(0.15)
+        print " "
+        print "b"
+        sleep(0.15)
+        print "y"
+        print ":"
+        sleep(1)
+        puts "\n\n"
+    end
+
+    def exit_confirmation
+        puts "\n\n"
+        puts "Are you sure you wish to exit the program?"
+        puts "\n\n"
+        puts "Type 'yes' or 'no'."
+        puts "-------------------------------------------"
+        input = gets.strip.downcase
+        case input
+        when 'yes'
+            puts "\n\n"
+            exit_message
+            exit
+        when 'no'
+            puts "\n\n"
+        end
     end
 end
