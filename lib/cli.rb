@@ -1,4 +1,5 @@
 require 'colorize'
+require 'colorized_string'
 class CurrencyExchange::CLI
     attr_accessor :error_input
     def initialize
@@ -134,11 +135,14 @@ class CurrencyExchange::CLI
 
         # puts "\n\n"
         puts "CURRENCIES".green + ":"
+        puts "---------------------------".yellow
         puts "\n"
         currencies.each do |currency| 
             sleep 0.15
             puts currency
         end
+        puts "\n"
+        puts "---------------------------".yellow
         puts "\n\n"
     end
 
@@ -212,19 +216,19 @@ class CurrencyExchange::CLI
     end
 
     def powered_by
-        print "P"
+        print "P".red
         sleep(0.15)
-        print "o"
+        print "o".yellow
         sleep(0.15)
-        print "w"
+        print "w".colorize(:blue)
         sleep(0.15)
-        print "e"
+        print "e".green
         sleep(0.15)
-        print "r"
+        print "r".yellow
         sleep(0.15)
-        print "e"
+        print "e".colorize(:blue)
         sleep(0.15)
-        print "d"
+        print "d".red
         sleep(0.15)
         print " "
         print "b"
@@ -237,7 +241,7 @@ class CurrencyExchange::CLI
 
     def exit_confirmation
         puts "\n\n"
-        puts "Are you sure you wish to exit the program?"
+        puts "Are you sure you wish to exit the program?".on_red.blink
         puts "\n\n"
         puts "Type " + "yes".red + " or " + "no".green + "."
         puts "-------------------------------------------"
