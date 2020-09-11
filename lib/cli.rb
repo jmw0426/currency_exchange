@@ -1,8 +1,7 @@
+require 'colorize'
 class CurrencyExchange::CLI
     attr_accessor :error_input
     def initialize
-        @page = 1
-        @limit = 11
         @error_input = []
     end
 
@@ -27,15 +26,15 @@ class CurrencyExchange::CLI
         
          EOF
         sleep(2) 
-        puts "        --------------------------------------------------------------------------------------------------------------------------------------------" 
+        puts "        --------------------------------------------------------------------------------------------------------------------------------------------".yellow 
         puts "\n"
-        puts '                                                            Welcome to the Currency Exchange!'
+        puts '                                                            Welcome to the Currency Exchange!'.green
         puts "\n\n"
-        puts '                                                  All currency rates are measured off of the US dollar.'
+        puts '                                                  All currency rates are measured off of the US dollar.'.green
         puts "\n\n"
-        puts '                                             Simply type in the number of the currency and start exchanging.'
+        puts '                                             Simply type in the number of the currency and start exchanging.'.green
         puts "\n"
-        puts "        --------------------------------------------------------------------------------------------------------------------------------------------" 
+        puts "        --------------------------------------------------------------------------------------------------------------------------------------------".yellow
         puts "\n\n"
         sleep(2)
     end
@@ -67,10 +66,15 @@ class CurrencyExchange::CLI
         # binding.pry
     end
 
+    def display_instructions
+        puts "Please choose a currency by number or type " + "exit".red  + " to exit the program."
+        puts "----------------------------------------------------------------------"
+    end
+
     def action_menu
-        puts "Type 'exit' to exit the program."
+        puts "Type " + "exit".red  + " to exit the program."
         sleep(1)
-        puts "Or type 'menu' to see the list of currencies."
+        puts "Or type " + "menu".yellow + " to see the list of currencies."
         puts "---------------------------------------------"
         input = gets.strip
         case input
@@ -129,7 +133,7 @@ class CurrencyExchange::CLI
         "33. PLN = Polish złoty"]
 
         # puts "\n\n"
-        puts "CURRENCIES:"
+        puts "CURRENCIES".green + ":"
         puts "\n"
         currencies.each do |currency| 
             sleep 0.15
@@ -143,7 +147,9 @@ class CurrencyExchange::CLI
         currency_obj = CurrencyExchange::Currency.all[i]
         puts "\n\n"
         sleep(1)
-        puts "It takes #{currency_obj.value} #{currency_obj.name} to equal the value of 1 US dollar."
+        puts "---------------------------------------------------------------".yellow
+        puts "It takes " + "#{currency_obj.value}".green + " #{currency_obj.name} to equal the value of 1 US dollar."
+        puts "---------------------------------------------------------------".yellow
         sleep(1)
         puts "\n\n\n\n"
         puts "Enter a USD value to convert to #{currency_obj.name}."
@@ -156,7 +162,9 @@ class CurrencyExchange::CLI
             error_dsc
         else
             puts "\n\n"
-            puts "#{input.to_f} USD is equal to #{exchange} #{currency_obj.name}."
+            puts "---------------------------------------------------------------".yellow
+            puts "#{input.to_f}".green + " USD is equal to " + "#{exchange}".green + " #{currency_obj.name}."
+            puts "---------------------------------------------------------------".yellow
             self.error_input.clear
             puts "\n\n"
             sleep(1)
@@ -178,7 +186,7 @@ class CurrencyExchange::CLI
         print "."
         sleep(1)
         puts "\n\n\n\n"
-        puts "That is not a valid entry."
+        puts "That is not a valid entry.".red
         sleep(1)
         puts "\n\n\n"
     end
@@ -188,23 +196,16 @@ class CurrencyExchange::CLI
         display_single_currency(i)
     end
 
-    def display_instructions
-        puts <<-INST
-Please choose a currency by number or type 'exit' to exit the program.
-        INST
-        puts "----------------------------------------------------------------------"
-    end
-
     def exit_message
         puts "\n\n"
-        puts "Thank you for using the Currency Exchange!"
+        puts "Thank you for using the Currency Exchange!".yellow
         puts "\n\n\n\n"
         powered_by 
         puts "----------------------------------------------"
         puts"\n"
-        puts "- https://api.exchangeratesapi.io/"
+        puts "- https://api.exchangeratesapi.io/".blue
         puts "\n\n"
-        puts "- https://github.com/jmw0426/currency_exchange"
+        puts "- https://github.com/jmw0426/currency_exchange".blue
         puts "\n"
         puts "----------------------------------------------"
         sleep(1.5)
@@ -238,7 +239,7 @@ Please choose a currency by number or type 'exit' to exit the program.
         puts "\n\n"
         puts "Are you sure you wish to exit the program?"
         puts "\n\n"
-        puts "Type 'yes' or 'no'."
+        puts "Type " + "yes".red + " or " + "no".green + "."
         puts "-------------------------------------------"
         input = gets.strip.downcase
         case input
