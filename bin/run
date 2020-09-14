@@ -3,4 +3,5 @@
 require_relative "../config/environment"
 
 CurrencyExchange::CLI.new.start
+# CurrencyExchange::AltCLI.new.start
 

@@ -16,6 +16,10 @@ class CurrencyExchange::Currency
         @@all
     end
 
+    def self.delete_all
+        self.all.clear
+    end
+
     def save 
         @@all << self
     end 
