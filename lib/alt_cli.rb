@@ -14,7 +14,6 @@ class CurrencyExchange::AltCLI
 
      def start
         introduction
-        get_currency_data
         main_loop
      end
 
@@ -47,7 +46,7 @@ class CurrencyExchange::AltCLI
 
      def main_loop
         loop do
-            # menu
+            menu
             input = choose_comparator
             case input
             when "exit"
@@ -76,7 +75,7 @@ class CurrencyExchange::AltCLI
             exit_confirmation
         when "menu"
             puts "\n\n"
-            choose_comparator
+            main_loop
         end
     end
 
@@ -88,6 +87,8 @@ class CurrencyExchange::AltCLI
         return input.downcase if commands.include?(input.downcase)
         if input.to_i.between?(1, CurrencyExchange::Currency.all.length)
             return input.to_i - 1
+        elsif input == 'exit'
+            exit
         else
             error_message
             return "invalid" 
@@ -95,19 +96,24 @@ class CurrencyExchange::AltCLI
     end
 
     def choose_base_rate
-        display_currency_list
         puts "Enter the number value of the currency you want to set as the base."
         input = gets.strip.to_i - 1
+
+        case input
+        when 18
+            display_euro_list
+        end
         choose_rate(input)
     end
 
     def choose_rate(i)
-        # binding.pry
+        get_currency_data
         currency_obj = CurrencyExchange::Currency.all[i]
         abbr = currency_obj.name
         @currency_selection << abbr
         CurrencyExchange::Currency.delete_all
         CurrencyExchange::APIManager.get_choice(abbr)
+        # binding.pry
     end
 
     def display_single_currency2(i)
@@ -134,6 +140,7 @@ class CurrencyExchange::AltCLI
             puts "#{input.to_f}".green + " #{@currency_selection[-1]} is equal to " + "#{exchange}".green + " #{currency_obj.name}."
             puts "---------------------------------------------------------------".yellow
             self.error_input.clear
+            self.currency_selection.clear
             puts "\n\n"
             sleep(1)
             action_menu
@@ -144,6 +151,54 @@ class CurrencyExchange::AltCLI
 
     def menu
         display_currency_list
+    end
+
+    def display_euro_list
+        currencies = ["1.  CAD = Canadian dollar",
+        "2.  HKD = Hong Kong dollar",
+        "3.  ISK = Icelandic króna",
+        "4.  PHP = Philippine peso",
+        "5.  DKK = Danish krone",
+        "6.  HUF = Hungarian forint",
+        "7.  CZK = Czech koruna",
+        "8.  AUD = Australian dollar",
+        "9.  RON = Romanian leu",
+        "10. SEK = Swedish krona",
+        "11. IDR = Indonesian rupiah",
+        "12. INR = Indian rupee",
+        "13. BRL = Brazilian real",
+        "14. RUB = Russian ruble",
+        "15. HRK = Croatian kuna",
+        "16. JPY = Japanese yen",
+        "17. THB = Thai baht",
+        "18. CHF = Swiss franc",
+        "19. SGD = Singapore dollar",
+        "20. PLN = Polish złoty",
+        "21. BGN = Bulgarian lev",
+        "22. TRY = Turkish lira",
+        "23. CNY = Chinese renminbi",
+        "24. NOK = Norwegian krone",
+        "25. NZD = New Zealand dollar",
+        "26. ZAR = South African rand",
+        "27. USD = United States dollar",
+        "28. MXN = Mexican peso",
+        "29. ILS = Israeli new shekel",
+        "30. GBP = Great British pound",
+        "31. KRW = South Korean won",
+        "32. MYR = Malaysian ringgit"]
+
+        puts "CURRENCIES".green + ":"
+        puts "---------------------------".yellow
+        puts "\n"
+
+        currencies.each do |currency| 
+            sleep 0.15
+            puts currency
+        end
+
+        puts "\n"
+        puts "---------------------------".yellow
+        puts "\n\n"
     end
 
     def display_currency_list
@@ -185,10 +240,12 @@ class CurrencyExchange::AltCLI
         puts "CURRENCIES".green + ":"
         puts "---------------------------".yellow
         puts "\n"
+
         currencies.each do |currency| 
             sleep 0.15
             puts currency
         end
+
         puts "\n"
         puts "---------------------------".yellow
         puts "\n\n"
@@ -217,7 +274,7 @@ class CurrencyExchange::AltCLI
 
     def redirect_to_dsc
         i = self.error_input[-1]
-        display_single_currency(i)
+        display_single_currency2(i)
     end
 
     # ------- Exit -------

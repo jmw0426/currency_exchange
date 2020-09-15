@@ -7,9 +7,17 @@ class CurrencyExchange::CLI
     end
 
     def start
+        welcome
         introduction
         get_currency_data
         main_loop
+    end
+
+    def welcome
+        puts "Welcome to the Currency Exchange! What is your name?\n\n".green.italic
+        system `say "Welcome to the Currency Exchange App! Please enter your name: "`
+        user = gets.strip
+        system `say "Hello #{user}. Get ready to start exchanging currency!"`
     end
 
     def introduction
@@ -69,6 +77,7 @@ class CurrencyExchange::CLI
     def display_instructions
         puts "Please choose a currency by number or type " + "exit".red  + " to exit the program."
         puts "----------------------------------------------------------------------"
+        system `say "Type in the number of the currency you wish to choose and press enter."`
     end
 
     def action_menu
@@ -149,10 +158,12 @@ class CurrencyExchange::CLI
         self.error_input << i
         currency_obj = CurrencyExchange::Currency.all[i]
         puts "\n\n"
+        system `say "You are currently converting US dollars to #{currency_obj.name}."`
         sleep(1)
         puts "---------------------------------------------------------------".yellow
         puts "It takes " + "#{currency_obj.value}".green + " #{currency_obj.name} to equal the value of 1 US dollar."
         puts "---------------------------------------------------------------".yellow
+        system `say "It takes #{currency_obj.value} #{currency_obj.name} to equal the value of one US dollar."`
         sleep(1)
         puts "\n\n\n\n"
         puts "Enter a USD value to convert to #{currency_obj.name}."
@@ -160,7 +171,7 @@ class CurrencyExchange::CLI
         input = gets.strip
         exchange = input.to_f * currency_obj.value.to_f
         if input == 'exit'
-            exit_confirmation
+            exit_confirmation until exit_confirmation == true
         elsif input == 'menu'
             action_menu    
         elsif exchange == 0
@@ -170,6 +181,7 @@ class CurrencyExchange::CLI
             puts "---------------------------------------------------------------".yellow
             puts "#{input.to_f}".green + " USD is equal to " + "#{exchange}".green + " #{currency_obj.name}."
             puts "---------------------------------------------------------------".yellow
+            system `say "Woah! That's a lot of moola!"`
             self.error_input.clear
             puts "\n\n"
             sleep(1)
@@ -243,6 +255,7 @@ class CurrencyExchange::CLI
     def exit_confirmation
         puts "\n\n"
         puts "Are you sure you wish to exit the program?".on_red.blink
+        system `say "Leaving so soon?"`
         puts "\n\n"
         puts "Type " + "yes".red + " or " + "no".green + "."
         puts "-------------------------------------------"
@@ -250,10 +263,14 @@ class CurrencyExchange::CLI
         case input
         when 'yes'
             puts "\n\n"
+            system `say "See you later!"`
             exit_message
             exit
         when 'no'
             puts "\n\n"
+            system `say "What do you want to exchange next?"`
+        else 
+            puts "I don't understand."    
         end
     end
 end
