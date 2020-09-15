@@ -14,8 +14,8 @@ class CurrencyExchange::Default_CLI
     end
 
     def welcome
-        puts "Welcome to the Currency Exchange! What is your name?\n\n".green.italic
-        system `say "Welcome to the Currency Exchange! Please enter your name: "`
+        puts "Welcome to the Default Mode of the Currency Exchange! What is your name?\n\n".green.italic
+        system `say "Welcome to the Default Mode of the Currency Exchange! Please enter your name: "` 
         self.user = gets.strip
         system `say "Hello #{self.user}. Get ready to start exchanging currency!"`
     end
@@ -26,18 +26,18 @@ class CurrencyExchange::Default_CLI
 
         puts <<-'EOF'
 
-        ██████╗██╗   ██╗██████╗ ██████╗ ███████╗███╗   ██╗ ██████╗██╗   ██╗    ███████╗██╗  ██╗ ██████╗██╗  ██╗ █████╗ ███╗   ██╗ ██████╗ ███████╗
+         ██████╗██╗   ██╗██████╗ ██████╗ ███████╗███╗   ██╗ ██████╗██╗   ██╗    ███████╗██╗  ██╗ ██████╗██╗  ██╗ █████╗ ███╗   ██╗ ██████╗ ███████╗
         ██╔════╝██║   ██║██╔══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝╚██╗ ██╔╝    ██╔════╝╚██╗██╔╝██╔════╝██║  ██║██╔══██╗████╗  ██║██╔════╝ ██╔════╝
         ██║     ██║   ██║██████╔╝██████╔╝█████╗  ██╔██╗ ██║██║      ╚████╔╝     █████╗   ╚███╔╝ ██║     ███████║███████║██╔██╗ ██║██║  ███╗█████╗  
         ██║     ██║   ██║██╔══██╗██╔══██╗██╔══╝  ██║╚██╗██║██║       ╚██╔╝      ██╔══╝   ██╔██╗ ██║     ██╔══██║██╔══██║██║╚██╗██║██║   ██║██╔══╝  
         ╚██████╗╚██████╔╝██║  ██║██║  ██║███████╗██║ ╚████║╚██████╗   ██║       ███████╗██╔╝ ██╗╚██████╗██║  ██║██║  ██║██║ ╚████║╚██████╔╝███████╗
-        ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝       ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
+         ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝       ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
         
         EOF
         sleep(2) 
         puts "        --------------------------------------------------------------------------------------------------------------------------------------------".yellow 
         puts "\n"
-        puts '                                                            Welcome to the Currency Exchange!'.green
+        puts '                                                                     Default Mode'.green
         puts "\n\n"
         puts '                                                  All currency rates are measured off of the US dollar.'.green
         puts "\n\n"
@@ -58,9 +58,7 @@ class CurrencyExchange::Default_CLI
             input = get_currency_choice
             case input
             when "exit"
-                farewell
-                exit_message
-                break
+                exit_confirmation
             when "invalid"
                 next
             else
@@ -76,15 +74,15 @@ class CurrencyExchange::Default_CLI
 
     def display_instructions
         puts "Please choose a currency by number or type " + "exit".red  + " to exit the program."
-        puts "----------------------------------------------------------------------"
-        system `say "Type in the number of the currency you wish to choose and press enter."`
+        puts "--------------------------------------------------------------------".yellow
+        system `say "Type in the number of the currency you wish to choose and press enter."` 
     end
 
     def action_menu
         puts "Type " + "exit".red  + " to exit the program."
         sleep(1)
         puts "Or type " + "menu".yellow + " to see the list of currencies."
-        puts "---------------------------------------------"
+        puts "---------------------------------------------".yellow
         
         input = gets.strip
         case input
@@ -170,7 +168,7 @@ class CurrencyExchange::Default_CLI
         sleep(1)
         puts "\n\n\n\n"
         puts "Enter a USD value to convert to #{currency_obj.name}."
-        puts "------------------------------------"
+        puts "------------------------------------".yellow
 
         input = gets.strip
         exchange = input.to_f * currency_obj.value.to_f
@@ -263,26 +261,23 @@ class CurrencyExchange::Default_CLI
         puts "Are you sure you wish to exit the program?".on_red.blink
         system `say "Leaving so soon?"`
         puts "\n\n"
-        puts "Type " + "yes".red + " or " + "no".green + "."
-        puts "-------------------------------------------"
+        puts "Type " + "yes".red + " to exit, " + "no".green + " to keep exchanging, or " + "mode".yellow + " to change to a different mode."
+        puts "-------------------------------------------------------------------------------".yellow
 
         input = gets.strip.downcase
         case input
         when 'yes'
+            system `say "See you later #{self.user}!"`
             puts "\n\n"
-            farewell
             exit_message
             exit
         when 'no'
-            puts "\n\n"
             system `say "What do you want to exchange next #{self.user}?"`
-        else 
-            puts "I don't understand."
-            return "invalid"    
+            puts "\n\n"
+        when 'mode'
+            system `say "Thanks for using Default Mode #{self.user}?"`
+            @launch_new = CurrencyExchange::CLI.new
+            @launch_new.start
         end
-    end
-
-    def farewell
-        system `say "See you later #{self.user}!"`
     end
 end

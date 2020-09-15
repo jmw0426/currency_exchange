@@ -3,16 +3,25 @@ class CurrencyExchange::FreeMode_CLI
 
      #------- CurrencyExchange::APIManager.get_choice(currency) -------
 
-    attr_accessor :currency_selection, :error_input
+    attr_accessor :currency_selection, :error_input, :user
 
-     def initialize
+     def initialize(user=nil)
         @currency_selection = []
         @error_input = []
+        @user = user
      end
 
      def start
+        welcome
         introduction
         main_loop
+     end
+
+     def welcome
+        puts "Welcome to the Free Mode of the Currency Exchange! What is your name?\n\n".green.italic
+        prompts(0)
+        self.user = gets.strip
+        system `say "Hello #{self.user}. Get ready to start exchanging currency!"`
      end
 
      def introduction
@@ -31,7 +40,7 @@ class CurrencyExchange::FreeMode_CLI
         sleep(2) 
         puts "        --------------------------------------------------------------------------------------------------------------------------------------------".yellow 
         puts "\n"
-        puts '                                                            Welcome to the Currency Exchange!'.green
+        puts '                                                                        Free Mode'.green
         puts "\n\n"
         puts '                                                      Here you can compare any currency to another.'.green
         puts "\n\n"
@@ -40,6 +49,20 @@ class CurrencyExchange::FreeMode_CLI
         puts "        --------------------------------------------------------------------------------------------------------------------------------------------".yellow
         puts "\n\n"
         sleep(2)
+     end
+
+     def prompts(num)
+        list  = ["Welcome to the Free Mode of the Currency Exchange! Please enter your name.", 
+        "Enter the number value of the currency you want to set as the base.", 
+        "Enter the number value of the currency you want to compare.", "Please try again.", 
+        "Type in the number of the currency you would like to set as the base and press enter.", 
+        "Type in the number of the currency to which you would like to convert and press enter." ]
+
+        prompt(list[num])
+     end
+
+     def prompt(v)
+        system `say "#{v}"`
      end
 
     # ------- Navigation -------
@@ -64,7 +87,7 @@ class CurrencyExchange::FreeMode_CLI
         puts "Type " + "exit".red  + " to exit the program."
         sleep(1)
         puts "Or type " + "menu".yellow + " to see the list of currencies."
-        puts "---------------------------------------------"
+        puts "---------------------------------------------".yellow
 
         input = gets.strip
         case input
@@ -84,7 +107,10 @@ class CurrencyExchange::FreeMode_CLI
 
     def choose_comparator
         choose_base_rate
+        puts "\n\n"
         puts "Enter the number value of the currency you want to compare."
+        puts "-----------------------------------------------------------".yellow
+        prompts(5)
         input = gets.strip.downcase
         commands = ["exit", "menu"]
         return input.downcase if commands.include?(input.downcase)
@@ -99,7 +125,10 @@ class CurrencyExchange::FreeMode_CLI
     end
 
     def choose_base_rate
+        puts "\n\n"
         puts "Enter the number value of the currency you want to set as the base."
+        puts "-------------------------------------------------------------------".yellow
+        prompts(4)
         input = gets.strip
 
         case input 
@@ -107,8 +136,8 @@ class CurrencyExchange::FreeMode_CLI
             exit_confirmation
             exit
         else
-            input.to_i - 1
-            choose_rate(input)
+            list_num = input.to_i - 1
+            choose_rate(list_num)
             puts "\n\n"
             puts "CURRENCIES:".green
             puts "---------------------------".yellow
@@ -122,8 +151,10 @@ class CurrencyExchange::FreeMode_CLI
     end
 
     def choose_rate(i)
+        CurrencyExchange::Currency.delete_all
         get_currency_data
-        currency_obj = CurrencyExchange::Currency.all[i]
+        # binding.pry
+        currency_obj = CurrencyExchange::Currency.all[i.to_i]
         abbr = currency_obj.name
         @currency_selection << abbr
         CurrencyExchange::Currency.delete_all
@@ -135,14 +166,16 @@ class CurrencyExchange::FreeMode_CLI
         currency_obj = CurrencyExchange::Currency.all[i]
 
         puts "\n\n"
+        system `say "You are currently converting #{currency_selection[-1]} to #{currency_obj.name}."`
         sleep(1)
         puts "---------------------------------------------------------------".yellow
         puts "It takes " + "#{currency_obj.value}".green + " #{currency_obj.name} to equal the value of 1 #{@currency_selection[-1]}."
         puts "---------------------------------------------------------------".yellow
+        system `say "It takes approximately #{currency_obj.value.to_i} #{currency_obj.name} to equal the value of one #{@currency_selection[-1]}."`
         sleep(1)
         puts "\n\n\n\n"
         puts "Enter a #{@currency_selection[-1]} value to convert to #{currency_obj.name}."
-        puts "------------------------------------"
+        puts "------------------------------------".yellow
 
         input = gets.strip
         exchange = input.to_f * currency_obj.value.to_f
@@ -155,6 +188,7 @@ class CurrencyExchange::FreeMode_CLI
             puts "---------------------------------------------------------------".yellow
             puts "#{input.to_f}".green + " #{@currency_selection[-1]} is equal to " + "#{exchange}".green + " #{currency_obj.name}."
             puts "---------------------------------------------------------------".yellow
+            system `say "Woah! That's a lot of moolah!"`
             puts "\n\n"
 
             self.error_input.clear
@@ -168,54 +202,6 @@ class CurrencyExchange::FreeMode_CLI
 
     def menu
         display_currency_list
-    end
-
-    def display_euro_list
-        currencies = ["1.  CAD = Canadian dollar",
-        "2.  HKD = Hong Kong dollar",
-        "3.  ISK = Icelandic króna",
-        "4.  PHP = Philippine peso",
-        "5.  DKK = Danish krone",
-        "6.  HUF = Hungarian forint",
-        "7.  CZK = Czech koruna",
-        "8.  AUD = Australian dollar",
-        "9.  RON = Romanian leu",
-        "10. SEK = Swedish krona",
-        "11. IDR = Indonesian rupiah",
-        "12. INR = Indian rupee",
-        "13. BRL = Brazilian real",
-        "14. RUB = Russian ruble",
-        "15. HRK = Croatian kuna",
-        "16. JPY = Japanese yen",
-        "17. THB = Thai baht",
-        "18. CHF = Swiss franc",
-        "19. SGD = Singapore dollar",
-        "20. PLN = Polish złoty",
-        "21. BGN = Bulgarian lev",
-        "22. TRY = Turkish lira",
-        "23. CNY = Chinese renminbi",
-        "24. NOK = Norwegian krone",
-        "25. NZD = New Zealand dollar",
-        "26. ZAR = South African rand",
-        "27. USD = United States dollar",
-        "28. MXN = Mexican peso",
-        "29. ILS = Israeli new shekel",
-        "30. GBP = Great British pound",
-        "31. KRW = South Korean won",
-        "32. MYR = Malaysian ringgit"]
-
-        puts "CURRENCIES".green + ":"
-        puts "---------------------------".yellow
-        puts "\n"
-
-        currencies.each do |currency| 
-            sleep 0.15
-            puts currency
-        end
-
-        puts "\n"
-        puts "---------------------------".yellow
-        puts "\n\n"
     end
 
     def display_currency_list
@@ -284,6 +270,7 @@ class CurrencyExchange::FreeMode_CLI
         sleep(1)
         puts "\n\n\n\n"
         puts "That is not a valid entry.".red
+        prompts(3)
         sleep(1)
         puts "\n\n\n"
     end
@@ -337,18 +324,25 @@ class CurrencyExchange::FreeMode_CLI
     def exit_confirmation
         puts "\n\n"
         puts "Are you sure you wish to exit the program?".on_red.blink
+        system `say "Leaving so soon?"`
         puts "\n\n"
-        puts "Type " + "yes".red + " or " + "no".green + "."
-        puts "-------------------------------------------"
+        puts "Type " + "yes".red + " to exit, " + "no".green + " to keep exchanging, or " + "mode".yellow + " to change to a different mode."
+        puts "----------------------------------------------------------------------------------".yellow
 
         input = gets.strip.downcase
         case input
         when 'yes'
+            system `say "See you later #{self.user}!"`
             puts "\n\n"
             exit_message
             exit
         when 'no'
+            system `say "What do you want to exchange next #{self.user}?"`
             puts "\n\n"
+        when 'mode'
+            system `say "Thanks for using Free Mode #{self.user}?"`
+            @launch_new = CurrencyExchange::CLI.new
+            @launch_new.start
         end
     end
     
