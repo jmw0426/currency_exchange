@@ -108,3 +108,6 @@ currencies = ["1.  CAD = Canadian dollar",
   "base": "EUR",
   "date": "2020-09-14"
 }
+
+
+

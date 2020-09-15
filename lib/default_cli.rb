@@ -1,63 +1,83 @@
 require 'colorize'
-class CurrencyExchange::FreeMode_CLI
-
-     #------- CurrencyExchange::APIManager.get_choice(currency) -------
-
-    attr_accessor :currency_selection, :error_input
-
-     def initialize
-        @currency_selection = []
+class CurrencyExchange::Default_CLI
+    attr_accessor :error_input, :user
+    def initialize(user=nil)
+        @user = user
         @error_input = []
-     end
+    end
 
-     def start
+    def start
+        welcome
         introduction
+        get_currency_data
         main_loop
-     end
+    end
 
-     def introduction
+    def welcome
+        puts "Welcome to the Currency Exchange! What is your name?\n\n".green.italic
+        system `say "Welcome to the Currency Exchange! Please enter your name: "`
+        self.user = gets.strip
+        system `say "Hello #{self.user}. Get ready to start exchanging currency!"`
+    end
+
+    def introduction
+
         puts "\n\n\n\n"
 
         puts <<-'EOF'
 
-         ██████╗██╗   ██╗██████╗ ██████╗ ███████╗███╗   ██╗ ██████╗██╗   ██╗    ███████╗██╗  ██╗ ██████╗██╗  ██╗ █████╗ ███╗   ██╗ ██████╗ ███████╗
+        ██████╗██╗   ██╗██████╗ ██████╗ ███████╗███╗   ██╗ ██████╗██╗   ██╗    ███████╗██╗  ██╗ ██████╗██╗  ██╗ █████╗ ███╗   ██╗ ██████╗ ███████╗
         ██╔════╝██║   ██║██╔══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝╚██╗ ██╔╝    ██╔════╝╚██╗██╔╝██╔════╝██║  ██║██╔══██╗████╗  ██║██╔════╝ ██╔════╝
         ██║     ██║   ██║██████╔╝██████╔╝█████╗  ██╔██╗ ██║██║      ╚████╔╝     █████╗   ╚███╔╝ ██║     ███████║███████║██╔██╗ ██║██║  ███╗█████╗  
         ██║     ██║   ██║██╔══██╗██╔══██╗██╔══╝  ██║╚██╗██║██║       ╚██╔╝      ██╔══╝   ██╔██╗ ██║     ██╔══██║██╔══██║██║╚██╗██║██║   ██║██╔══╝  
         ╚██████╗╚██████╔╝██║  ██║██║  ██║███████╗██║ ╚████║╚██████╗   ██║       ███████╗██╔╝ ██╗╚██████╗██║  ██║██║  ██║██║ ╚████║╚██████╔╝███████╗
-         ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝       ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
+        ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝ ╚═════╝   ╚═╝       ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
         
-         EOF
+        EOF
         sleep(2) 
         puts "        --------------------------------------------------------------------------------------------------------------------------------------------".yellow 
         puts "\n"
         puts '                                                            Welcome to the Currency Exchange!'.green
         puts "\n\n"
-        puts '                                                      Here you can compare any currency to another.'.green
+        puts '                                                  All currency rates are measured off of the US dollar.'.green
         puts "\n\n"
         puts '                                             Simply type in the number of the currency and start exchanging.'.green
         puts "\n"
         puts "        --------------------------------------------------------------------------------------------------------------------------------------------".yellow
         puts "\n\n"
         sleep(2)
-     end
+    end
 
-    # ------- Navigation -------
+    def get_currency_data
+        CurrencyExchange::APIManager.get_rates
+    end
 
     def main_loop
         loop do
             menu
-            input = choose_comparator
+            input = get_currency_choice
             case input
             when "exit"
+                farewell
                 exit_message
-                exit
+                break
             when "invalid"
                 next
             else
-                display_single_currency2(input)
+                display_single_currency(input)
             end
         end
+    end
+
+    def menu
+        display_currency_list
+        display_instructions
+    end
+
+    def display_instructions
+        puts "Please choose a currency by number or type " + "exit".red  + " to exit the program."
+        puts "----------------------------------------------------------------------"
+        system `say "Type in the number of the currency you wish to choose and press enter."`
     end
 
     def action_menu
@@ -65,157 +85,26 @@ class CurrencyExchange::FreeMode_CLI
         sleep(1)
         puts "Or type " + "menu".yellow + " to see the list of currencies."
         puts "---------------------------------------------"
-
+        
         input = gets.strip
         case input
         when "exit"
             exit_confirmation
         when "menu"
             puts "\n\n"
-            main_loop
         end
     end
 
-    # ------- Engine --------
-
-    def get_currency_data
-        CurrencyExchange::APIManager.get_rates
-    end
-
-    def choose_comparator
-        choose_base_rate
-        puts "Enter the number value of the currency you want to compare."
+    def get_currency_choice
         input = gets.strip.downcase
         commands = ["exit", "menu"]
         return input.downcase if commands.include?(input.downcase)
         if input.to_i.between?(1, CurrencyExchange::Currency.all.length)
             return input.to_i - 1
-        elsif input == 'exit'
-            exit
         else
             error_message
             return "invalid" 
         end
-    end
-
-    def choose_base_rate
-        puts "Enter the number value of the currency you want to set as the base."
-        input = gets.strip
-
-        case input 
-        when 'exit'
-            exit_confirmation
-            exit
-        else
-            input.to_i - 1
-            choose_rate(input)
-            puts "\n\n"
-            puts "CURRENCIES:".green
-            puts "---------------------------".yellow
-            puts "\n"
-            CurrencyExchange::Currency.all.each.with_index(1) do |currency, index| 
-                puts "#{index}. #{currency.name}" 
-                sleep(0.15)
-            end
-            puts "---------------------------".yellow
-        end
-    end
-
-    def choose_rate(i)
-        get_currency_data
-        currency_obj = CurrencyExchange::Currency.all[i]
-        abbr = currency_obj.name
-        @currency_selection << abbr
-        CurrencyExchange::Currency.delete_all
-        CurrencyExchange::APIManager.get_choice(abbr)
-    end
-
-    def display_single_currency2(i)
-        self.error_input << i
-        currency_obj = CurrencyExchange::Currency.all[i]
-
-        puts "\n\n"
-        sleep(1)
-        puts "---------------------------------------------------------------".yellow
-        puts "It takes " + "#{currency_obj.value}".green + " #{currency_obj.name} to equal the value of 1 #{@currency_selection[-1]}."
-        puts "---------------------------------------------------------------".yellow
-        sleep(1)
-        puts "\n\n\n\n"
-        puts "Enter a #{@currency_selection[-1]} value to convert to #{currency_obj.name}."
-        puts "------------------------------------"
-
-        input = gets.strip
-        exchange = input.to_f * currency_obj.value.to_f
-        if input == 'exit'
-            exit_confirmation
-        elsif exchange == 0
-            error_dsc 
-        else
-            puts "\n\n"
-            puts "---------------------------------------------------------------".yellow
-            puts "#{input.to_f}".green + " #{@currency_selection[-1]} is equal to " + "#{exchange}".green + " #{currency_obj.name}."
-            puts "---------------------------------------------------------------".yellow
-            puts "\n\n"
-
-            self.error_input.clear
-            self.currency_selection.clear
-            sleep(1)
-            action_menu
-        end
-    end
-
-    # ------- Display List -------
-
-    def menu
-        display_currency_list
-    end
-
-    def display_euro_list
-        currencies = ["1.  CAD = Canadian dollar",
-        "2.  HKD = Hong Kong dollar",
-        "3.  ISK = Icelandic króna",
-        "4.  PHP = Philippine peso",
-        "5.  DKK = Danish krone",
-        "6.  HUF = Hungarian forint",
-        "7.  CZK = Czech koruna",
-        "8.  AUD = Australian dollar",
-        "9.  RON = Romanian leu",
-        "10. SEK = Swedish krona",
-        "11. IDR = Indonesian rupiah",
-        "12. INR = Indian rupee",
-        "13. BRL = Brazilian real",
-        "14. RUB = Russian ruble",
-        "15. HRK = Croatian kuna",
-        "16. JPY = Japanese yen",
-        "17. THB = Thai baht",
-        "18. CHF = Swiss franc",
-        "19. SGD = Singapore dollar",
-        "20. PLN = Polish złoty",
-        "21. BGN = Bulgarian lev",
-        "22. TRY = Turkish lira",
-        "23. CNY = Chinese renminbi",
-        "24. NOK = Norwegian krone",
-        "25. NZD = New Zealand dollar",
-        "26. ZAR = South African rand",
-        "27. USD = United States dollar",
-        "28. MXN = Mexican peso",
-        "29. ILS = Israeli new shekel",
-        "30. GBP = Great British pound",
-        "31. KRW = South Korean won",
-        "32. MYR = Malaysian ringgit"]
-
-        puts "CURRENCIES".green + ":"
-        puts "---------------------------".yellow
-        puts "\n"
-
-        currencies.each do |currency| 
-            sleep 0.15
-            puts currency
-        end
-
-        puts "\n"
-        puts "---------------------------".yellow
-        puts "\n\n"
     end
 
     def display_currency_list
@@ -267,13 +156,49 @@ class CurrencyExchange::FreeMode_CLI
         puts "\n\n"
     end
 
-    # ------- Error handling -------
+    def display_single_currency(i)
+        self.error_input << i
+        currency_obj = CurrencyExchange::Currency.all[i]
+
+        puts "\n\n"
+        system `say "You are currently converting US dollars to #{currency_obj.name}."`
+        sleep(1)
+        puts "---------------------------------------------------------------".yellow
+        puts "It takes " + "#{currency_obj.value}".green + " #{currency_obj.name} to equal the value of 1 US dollar."
+        puts "---------------------------------------------------------------".yellow
+        system `say "It takes approximately #{currency_obj.value.to_i} #{currency_obj.name} to equal the value of one US dollar."`
+        sleep(1)
+        puts "\n\n\n\n"
+        puts "Enter a USD value to convert to #{currency_obj.name}."
+        puts "------------------------------------"
+
+        input = gets.strip
+        exchange = input.to_f * currency_obj.value.to_f
+        if input == 'exit'
+            exit_confirmation
+        elsif input == 'menu'
+            action_menu    
+        elsif exchange == 0
+            error_dsc
+        else
+            puts "\n\n"
+            puts "---------------------------------------------------------------".yellow
+            puts "#{input.to_f}".green + " USD is equal to " + "#{exchange}".green + " #{currency_obj.name}."
+            puts "---------------------------------------------------------------".yellow
+            system `say "Woah! That's a lot of moola!"`
+            puts "\n\n"
+
+            self.error_input.clear
+            sleep(1)
+            action_menu
+        end
+    end
 
     def error_dsc
         error_message
         redirect_to_dsc
     end
-
+        
     def error_message
         puts "\n\n"
         print "."
@@ -284,16 +209,15 @@ class CurrencyExchange::FreeMode_CLI
         sleep(1)
         puts "\n\n\n\n"
         puts "That is not a valid entry.".red
+        system `say "Please try again."`
         sleep(1)
         puts "\n\n\n"
     end
 
     def redirect_to_dsc
         i = self.error_input[-1]
-        display_single_currency2(i)
+        display_single_currency(i)
     end
-
-    # ------- Exit -------
 
     def exit_message
         puts "\n\n"
@@ -337,6 +261,7 @@ class CurrencyExchange::FreeMode_CLI
     def exit_confirmation
         puts "\n\n"
         puts "Are you sure you wish to exit the program?".on_red.blink
+        system `say "Leaving so soon?"`
         puts "\n\n"
         puts "Type " + "yes".red + " or " + "no".green + "."
         puts "-------------------------------------------"
@@ -345,11 +270,19 @@ class CurrencyExchange::FreeMode_CLI
         case input
         when 'yes'
             puts "\n\n"
+            farewell
             exit_message
             exit
         when 'no'
             puts "\n\n"
+            system `say "What do you want to exchange next #{self.user}?"`
+        else 
+            puts "I don't understand."
+            return "invalid"    
         end
     end
-    
+
+    def farewell
+        system `say "See you later #{self.user}!"`
+    end
 end
