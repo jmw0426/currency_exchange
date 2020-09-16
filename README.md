@@ -22,7 +22,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+The Currency Exchange is a gem that parses exchange rates recognized by the European Central Bank from https://api.exchangeratesapi.io/ and utilizes that data in order to conduct exchanges between currencies. There are two modes. Default Mode only converts USD to into one of 32 currencies. Free Mode allows the user to select one out of 33 currencies to convert into another. 
 
 ## Development
 
@@ -32,7 +32,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/<github username>/currency_exchange.
+Bug reports and pull requests are welcome on GitHub at https://github.com/jmw0426/currency_exchange.
 
 
 ## License
