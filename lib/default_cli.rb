@@ -48,24 +48,7 @@ class CurrencyExchange::Default_CLI
         sleep(2)
     end
 
-    def get_currency_data
-        CurrencyExchange::APIManager.get_rates
-    end
-
-    def main_loop
-        loop do
-            menu
-            input = get_currency_choice
-            case input
-            when "exit"
-                exit_confirmation
-            when "invalid"
-                next
-            else
-                display_single_currency(input)
-            end
-        end
-    end
+    # --------- Menu ----------
 
     def menu
         display_currency_list
@@ -90,18 +73,6 @@ class CurrencyExchange::Default_CLI
             exit_confirmation
         when "menu"
             puts "\n\n"
-        end
-    end
-
-    def get_currency_choice
-        input = gets.strip.downcase
-        commands = ["exit", "menu"]
-        return input.downcase if commands.include?(input.downcase)
-        if input.to_i.between?(1, CurrencyExchange::Currency.all.length)
-            return input.to_i - 1
-        else
-            error_message
-            return "invalid" 
         end
     end
 
@@ -154,6 +125,39 @@ class CurrencyExchange::Default_CLI
         puts "\n\n"
     end
 
+    # ---------- Engine -----------
+
+    def get_currency_data
+        CurrencyExchange::APIManager.get_rates
+    end
+
+    def main_loop
+        loop do
+            menu
+            input = get_currency_choice
+            case input
+            when "exit"
+                exit_confirmation
+            when "invalid"
+                next
+            else
+                display_single_currency(input)
+            end
+        end
+    end
+
+    def get_currency_choice
+        input = gets.strip.downcase
+        commands = ["exit", "menu"]
+        return input.downcase if commands.include?(input.downcase)
+        if input.to_i.between?(1, CurrencyExchange::Currency.all.length)
+            return input.to_i - 1
+        else
+            error_message
+            return "invalid" 
+        end
+    end
+
     def display_single_currency(i)
         self.error_input << i
         currency_obj = CurrencyExchange::Currency.all[i]
@@ -192,6 +196,8 @@ class CurrencyExchange::Default_CLI
         end
     end
 
+    # ---------- Error ------------
+
     def error_dsc
         error_message
         redirect_to_dsc
@@ -216,6 +222,8 @@ class CurrencyExchange::Default_CLI
         i = self.error_input[-1]
         display_single_currency(i)
     end
+
+    # ------------ Exit ------------
 
     def exit_message
         puts "\n\n"
