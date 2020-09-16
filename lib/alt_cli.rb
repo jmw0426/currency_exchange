@@ -51,6 +51,8 @@ class CurrencyExchange::FreeMode_CLI
         sleep(2)
      end
 
+     # -------- System Says ---------
+
      def prompts(num)
         list  = ["Welcome to the Free Mode of the Currency Exchange! Please enter your name.", 
         "Enter the number value of the currency you want to set as the base.", 
