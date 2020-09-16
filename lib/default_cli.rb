@@ -177,10 +177,8 @@ class CurrencyExchange::Default_CLI
         input = gets.strip
         exchange = input.to_f * currency_obj.value.to_f
         if input == 'exit'
-            CurrencyExchange::Currency.delete_all
             exit_confirmation
         elsif input == 'menu'
-            CurrencyExchange::Currency.delete_all
             action_menu    
         elsif exchange == 0
             error_dsc
@@ -191,7 +189,6 @@ class CurrencyExchange::Default_CLI
             puts "---------------------------------------------------------------".yellow
             system `say "Woah! That's a lot of moola!"`
             puts "\n\n"
-            CurrencyExchange::Currency.delete_all
             self.error_input.clear
             sleep(1)
             action_menu
@@ -286,6 +283,7 @@ class CurrencyExchange::Default_CLI
             system `say "What do you want to exchange next #{self.user}?"`
             puts "\n\n"
         when 'mode'
+            CurrencyExchange::Currency.delete_all
             system `say "Thanks for using Default Mode #{self.user}?"`
             @launch_new = CurrencyExchange::CLI.new
             @launch_new.start
